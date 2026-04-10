@@ -393,6 +393,45 @@ function canvasToBlob(canvas: HTMLCanvasElement) {
   });
 }
 
+function downloadResultBlob(blob: Blob, filename: string) {
+  const downloadUrl = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = downloadUrl;
+  anchor.download = filename;
+  anchor.click();
+  window.setTimeout(() => {
+    URL.revokeObjectURL(downloadUrl);
+  }, 1200);
+}
+
+async function shareResultBlob(blob: Blob, filename: string) {
+  if (typeof navigator === "undefined" || typeof navigator.share !== "function" || typeof File !== "function") {
+    return "unsupported" as const;
+  }
+
+  const file = new File([blob], filename, { type: "image/png" });
+  const shareData = {
+    files: [file],
+    title: "SBTI Result",
+    text: "这是我刚生成的 SBTI 结果图。",
+  };
+
+  if (typeof navigator.canShare === "function" && !navigator.canShare({ files: [file] })) {
+    return "unsupported" as const;
+  }
+
+  try {
+    await navigator.share(shareData);
+    return "shared" as const;
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      return "cancelled" as const;
+    }
+
+    return "failed" as const;
+  }
+}
+
 async function buildResultImage(params: {
   result: ResultState;
   currentType: TypeProfile;
@@ -1332,15 +1371,25 @@ export function SbtiApp() {
         topMatches,
         typeImage,
       });
-      const downloadUrl = URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
-      anchor.href = downloadUrl;
-      anchor.download = `sbti-${currentType.code.replace(/[^a-z0-9-]/gi, "-").toLowerCase()}-result.png`;
-      anchor.click();
-      window.setTimeout(() => {
-        URL.revokeObjectURL(downloadUrl);
-      }, 1200);
-      setSaveImageNotice("结果图片已经开始下载。");
+      const filename = `sbti-${currentType.code.replace(/[^a-z0-9-]/gi, "-").toLowerCase()}-result.png`;
+      const shareState = await shareResultBlob(blob, filename);
+
+      if (shareState === "shared") {
+        setSaveImageNotice("已打开系统分享面板，你可以直接保存到相册。");
+        return;
+      }
+
+      if (shareState === "cancelled") {
+        setSaveImageNotice("你取消了本次分享。");
+        return;
+      }
+
+      downloadResultBlob(blob, filename);
+      setSaveImageNotice(
+        shareState === "failed"
+          ? "当前浏览器未能直接调起系统分享，已回退为下载图片。"
+          : "当前浏览器不支持直接保存到相册，已开始下载图片。",
+      );
     } catch (error) {
       console.error(error);
       setSaveImageNotice("保存失败了，请稍后再试。");
@@ -1820,7 +1869,7 @@ export function SbtiApp() {
               </div>
             </CardSpotlight>
 
-            <details className="details-panel mt-5 overflow-hidden rounded-[1.75rem] p-6 text-[color:var(--text-secondary)]">
+            <details className="details-panel mt-5 rounded-[1.75rem] p-6 text-[color:var(--text-secondary)]">
               <summary className="cursor-pointer list-none text-2xl font-black tracking-[-0.05em] text-[var(--text-primary)]">
                 作者的话
               </summary>
@@ -1830,6 +1879,13 @@ export function SbtiApp() {
                 <p>这个测试没法很好地平衡娱乐和专业性，因此某些人格解释可能模糊甚至不准，如有冒犯非常抱歉。</p>
                 <p>总之好玩为主，请不要把它用于盈利、诊断或人生裁决。</p>
               </div>
+              <summary className="cursor-pointer list-none text-2xl font-black tracking-[-0.05em] text-[var(--text-primary)]">
+                改编者的话
+              </summary>
+              <div className="mt-5 space-y-4 border-t border-[var(--border)] pt-5 text-sm leading-8">
+                我无话可说
+              </div>
+
             </details>
 
             <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
@@ -1846,7 +1902,7 @@ export function SbtiApp() {
                   onClick={saveResultAsImage}
                   disabled={isSavingImage}
                 >
-                  {isSavingImage ? "正在生成图片..." : "保存为图片"}
+                  {isSavingImage ? "正在生成图片..." : "保存/分享图片"}
                 </button>
                 <button type="button" className="signal-button signal-button-secondary w-full sm:w-auto" onClick={startTest}>
                   重新测试
