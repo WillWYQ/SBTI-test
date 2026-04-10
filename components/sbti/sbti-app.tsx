@@ -1282,6 +1282,10 @@ export function SbtiApp() {
   };
 
   const navigateQuestion = (nextIndex: number) => {
+    const activeElement = document.activeElement;
+    if (activeElement instanceof HTMLElement) {
+      activeElement.blur();
+    }
     setCurrentQuestionIndex(nextIndex);
     pulseTransition();
   };

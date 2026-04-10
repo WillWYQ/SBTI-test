@@ -521,10 +521,6 @@ button {
     box-shadow 180ms ease;
 }
 
-.signal-button:hover {
-  transform: translateY(-2px);
-}
-
 .signal-button-primary {
   border: 1px solid var(--border-strong);
   background: var(--button-primary-fill);
@@ -536,10 +532,6 @@ button {
   border: 1px solid var(--button-secondary-border);
   background: var(--button-secondary-fill);
   color: var(--button-secondary-text);
-}
-
-.signal-button-secondary:hover {
-  background: var(--button-secondary-hover);
 }
 
 .metric-card,
@@ -743,10 +735,6 @@ button {
   transition: opacity 180ms ease;
 }
 
-.question-card:hover::before {
-  opacity: 1;
-}
-
 .answer-option {
   display: grid;
   grid-template-columns: auto auto minmax(0, 1fr);
@@ -761,13 +749,8 @@ button {
     background 180ms ease,
     border-color 180ms ease,
     box-shadow 180ms ease;
-}
-
-.answer-option:hover {
-  transform: translateY(-1px);
-  border-color: var(--option-border-hover);
-  background: var(--option-fill-hover);
-  box-shadow: var(--surface-shadow);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .answer-option-active {
@@ -838,12 +821,8 @@ button {
     border-color 180ms ease,
     color 180ms ease,
     background 180ms ease;
-}
-
-.question-dot-row:hover {
-  transform: translateX(2px);
-  border-color: var(--dot-row-border-hover);
-  color: var(--dot-row-text-hover);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .question-dot-row-active {
@@ -878,6 +857,33 @@ button {
   background: var(--scene-flash);
   mix-blend-mode: screen;
   animation: sceneFlash 520ms ease-out;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .signal-button:hover {
+    transform: translateY(-2px);
+  }
+
+  .signal-button-secondary:hover {
+    background: var(--button-secondary-hover);
+  }
+
+  .question-card:hover::before {
+    opacity: 1;
+  }
+
+  .answer-option:hover {
+    transform: translateY(-1px);
+    border-color: var(--option-border-hover);
+    background: var(--option-fill-hover);
+    box-shadow: var(--surface-shadow);
+  }
+
+  .question-dot-row:hover {
+    transform: translateX(2px);
+    border-color: var(--dot-row-border-hover);
+    color: var(--dot-row-text-hover);
+  }
 }
 
 .glitch-text {
