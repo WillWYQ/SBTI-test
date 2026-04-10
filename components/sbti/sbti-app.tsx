@@ -73,7 +73,7 @@ const transitionMessages = [
   "请勿在审判中途关闭灵魂窗口",
 ];
 const RESULT_IMAGE_WIDTH = 1440;
-const RESULT_IMAGE_HEIGHT = 2920;
+const RESULT_IMAGE_HEIGHT = 3120;
 const RESULT_IMAGE_FONT_STACK =
   "'SF Pro Display', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Segoe UI', system-ui, sans-serif";
 const SITE_LOGO = "/sbti/logo.png";
@@ -528,8 +528,8 @@ async function buildResultImage(params: {
   const posterCardHeight = 780;
   const infoCardX = contentX + posterCardWidth + cardGap;
   const infoCardWidth = contentWidth - posterCardWidth - cardGap;
-  const topMatchesCardY = contentY + 1138;
-  const dimensionGridY = contentY + 1536;
+  const topMatchesCardY = contentY + 1316;
+  const dimensionGridY = contentY + 1670;
   const columnGap = 20;
   const gridCardWidth = (contentWidth - columnGap * 2) / 3;
   const generatedDate = new Intl.DateTimeFormat("zh-CN", {
@@ -617,7 +617,7 @@ async function buildResultImage(params: {
   );
 
   if (posterImage) {
-    drawImageTiled(context, posterImage, posterFrameX, posterFrameY, posterFrameWidth, posterFrameHeight, 24, 150);
+    drawImageContain(context, posterImage, posterFrameX, posterFrameY, posterFrameWidth, posterFrameHeight, 24, 18);
   } else {
     const placeholderGradient = context.createLinearGradient(
       posterFrameX,
@@ -815,7 +815,7 @@ async function buildResultImage(params: {
   drawTextBlock(context, {
     text: "十五维度矩阵",
     x: contentX,
-    y: contentY + 1450,
+    y: contentY + 1568,
     maxWidth: 320,
     lineHeight: 36,
     font: `800 34px ${RESULT_IMAGE_FONT_STACK}`,
@@ -825,7 +825,7 @@ async function buildResultImage(params: {
   drawTextBlock(context, {
     text: "15D Signal Grid",
     x: contentX,
-    y: contentY + 1498,
+    y: contentY + 1616,
     maxWidth: 240,
     lineHeight: 30,
     font: `600 22px ${RESULT_IMAGE_FONT_STACK}`,
@@ -909,7 +909,7 @@ async function buildResultImage(params: {
     maxLines: 1,
   });
   drawTextBlock(context, {
-    text: "把这张图发出去，对方扫一下就能直接打开站点。",
+    text: "顺手也把你朋友拉来测测，反正大家都疯了，谁也别装正常。",
     x: contentX,
     y: qrCardY + 124,
     maxWidth: 680,
@@ -1752,16 +1752,16 @@ export function SbtiApp() {
                 </div>
                 <div className="relative z-10 flex h-full flex-col gap-4">
                   <div
-                    className="poster-image-wrap poster-image-wrap-tile"
+                    className="poster-image-wrap"
                     role="img"
                     aria-label={`${currentType.code}（${currentType.cn}）`}
                     style={
                       typeImage
                         ? {
                             backgroundImage: `url(${typeImage})`,
-                            backgroundRepeat: "repeat",
-                            backgroundSize: "9.5rem auto",
-                            backgroundPosition: "center top",
+                            backgroundRepeat: "no-repeat",
+                            backgroundSize: "contain",
+                            backgroundPosition: "center center",
                           }
                         : undefined
                     }
